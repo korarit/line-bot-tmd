@@ -1,11 +1,12 @@
 # line-bot-tmd
-### line bot รายงานสภาพอากาศ ผ่าน api ของกรมอุตุนิยมวิทยา
+### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา
 
 ความสามารถของระบบ (Fuction)
-* พยากรณ์อากาศ 3ชั่วโมง
-* พยากรณ์อากาศ วันนี้
-* พยากรณ์อากาศ 3วัน
-* ส่งข้อความ link ติดต่อผู้พัฒนา
+* ใช้ location ในการค้นหาข้อมูล
+  * พยากรณ์อากาศ 3ชั่วโมง
+  * พยากรณ์อากาศ วันนี้
+  * พยากรณ์อากาศ 3วัน
+  * ส่งข้อความ link ติดต่อผู้พัฒนา
 
 ## requestment ของตัวระบบ
 * flask
@@ -15,5 +16,21 @@
 * datetime
 
 ## line api
-> My name is Jonh Doe
-> I'm reading readme.md tutorial
+> line_bot_api = LineBotApi('Channel_access_token')
+> handler = WebhookHandler('Channel_secret')
+Channel_access_token หาได้จากหน้า Messaging API
+Channel_secret หาได้จากหน้า Basic setting
+
+## tmd api
+> api_tmd = 'api_key'
+api key หาได้จาก https://data.tmd.go.th/nwpapi/register เมื่อสมัครจะได้รับ Personal Access Tokens
+
+## Preview
+![Image](https://i.imgur.com/shRM4s2.png)
+
+## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
+ID สำหรับแอดไลน์บอท (ID line add friend bot)
+> @911xspfk
+
+QRCODE ADD ไลน์ (ORCODE line add friend bot)
+![Image](https://qr-official.line.me/sid/L/911xspfk.png)

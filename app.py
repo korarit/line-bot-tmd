@@ -22,7 +22,7 @@ handler = WebhookHandler('60c9d887805e00521665083b6735ddf7')
 
 data_select = 'not_have'
 
-@app.route("/webhook", methods=['POST'])
+@app.route("/callback", methods=['POST'])
 def callback():
     global data_select
     # get request body as text

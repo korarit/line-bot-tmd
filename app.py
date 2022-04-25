@@ -17,10 +17,12 @@ from datetime import (date, timedelta, datetime)
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('Z73uaOfQbjn3zjPJq9NQ9lVesn3YbDmm/3aQb2nktCKCWHmHSxQsCQv8Wz8oh1fgm/74pzVHHJee9Te2jiWAAFcvK5MwRIo3b4ne68e+3mIJ0qLBGXGJcXmWLYHe7kVpdJkekF3kOSLRfawbFmsYEQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('60c9d887805e00521665083b6735ddf7')
+line_bot_api = LineBotApi('')
+handler = WebhookHandler('')
 
 data_select = 'not_have'
+
+api_tmd = 'api_key'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -104,7 +106,7 @@ def hour3(lat,lon):
 
         headers = {
             'accept': "application/json",
-            'authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImIyYTFkNjY4M2MwYTBmMzcwNDNhMmNkZTA1ODUyMTliOGZhYjdiMjQzZWYzNDAyMTY2ZGY0MDQ4ZTA3MGVmYzAxNGRlMThmYmYxYTQzM2YyIn0.eyJhdWQiOiIyIiwianRpIjoiYjJhMWQ2NjgzYzBhMGYzNzA0M2EyY2RlMDU4NTIxOWI4ZmFiN2IyNDNlZjM0MDIxNjZkZjQwNDhlMDcwZWZjMDE0ZGUxOGZiZjFhNDMzZjIiLCJpYXQiOjE2Mjg5MzI0MjgsIm5iZiI6MTYyODkzMjQyOCwiZXhwIjoxNjYwNDY4NDI4LCJzdWIiOiI5NTQiLCJzY29wZXMiOltdfQ.WpR-KbNJrJm6rmcWdHHyKG-COOL1bBA_wulgD1o7-5axdOWgNhEKx4TQiUNefXE9MqCtC1bRR7-nHTyaN7awhMS6reU2qciV4ULJRKOKTRV5ap1JdpZxakkU0QvE4TMgxhLTEZYiZdl4t_Y7UiIxAQo-75hXMNu-rGoM5KknRp2NAZbnEOnrFMAVBUwi0H7woj1XH9lUXWZ8W87-vHdOO7_ng1KtH21QCGVR1xmnr2vfp3Z766BxXlb_CODOIf3RFFyZWDcZwZxgibmSOad-YAl4R5SU21zetJyMFNS_6X5W5_3S-3AVpHiyn1XoXXkryPSRyzIIFkjTyDc0dj8bC-G5im9iyN-jB47PXfVSaDa1M7t3EGOnGpJdlBO_W1WiHLRNznFAmptL35yFEvPXy9x744vAzXRxTWFGepTjpiyXKE7mOPiajaFfjdKp05WCEfYXZxfM1evIbPieNTUd1KLVhqEi0e433V5-JkEt7udCmX-p6iCj1QNdTzc1ckDnXzdR_LVDNqtYa7y5YdEBwAs8qJGt-SArsvol0riCS-CWkYlOc5PkOGgX9ia4aDpnVcMXMVBEJRkPUT1jRBw6_lUG3kelBbMVJcDoPH32fg33RXz4EYugUY4wS7YiPFrpIzQ-5WCnexjeWGr6PmNqIe8yc-QqGnv246vlyjmU0IU",
+            'authorization': "Bearer " + api_tmd,
         }
 
         response = requests.request("GET", url, headers=headers, params=querystring)
@@ -143,7 +145,7 @@ def day_now(lat,lon):
 
     headers = {
         'accept': "application/json",
-        'authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImIyYTFkNjY4M2MwYTBmMzcwNDNhMmNkZTA1ODUyMTliOGZhYjdiMjQzZWYzNDAyMTY2ZGY0MDQ4ZTA3MGVmYzAxNGRlMThmYmYxYTQzM2YyIn0.eyJhdWQiOiIyIiwianRpIjoiYjJhMWQ2NjgzYzBhMGYzNzA0M2EyY2RlMDU4NTIxOWI4ZmFiN2IyNDNlZjM0MDIxNjZkZjQwNDhlMDcwZWZjMDE0ZGUxOGZiZjFhNDMzZjIiLCJpYXQiOjE2Mjg5MzI0MjgsIm5iZiI6MTYyODkzMjQyOCwiZXhwIjoxNjYwNDY4NDI4LCJzdWIiOiI5NTQiLCJzY29wZXMiOltdfQ.WpR-KbNJrJm6rmcWdHHyKG-COOL1bBA_wulgD1o7-5axdOWgNhEKx4TQiUNefXE9MqCtC1bRR7-nHTyaN7awhMS6reU2qciV4ULJRKOKTRV5ap1JdpZxakkU0QvE4TMgxhLTEZYiZdl4t_Y7UiIxAQo-75hXMNu-rGoM5KknRp2NAZbnEOnrFMAVBUwi0H7woj1XH9lUXWZ8W87-vHdOO7_ng1KtH21QCGVR1xmnr2vfp3Z766BxXlb_CODOIf3RFFyZWDcZwZxgibmSOad-YAl4R5SU21zetJyMFNS_6X5W5_3S-3AVpHiyn1XoXXkryPSRyzIIFkjTyDc0dj8bC-G5im9iyN-jB47PXfVSaDa1M7t3EGOnGpJdlBO_W1WiHLRNznFAmptL35yFEvPXy9x744vAzXRxTWFGepTjpiyXKE7mOPiajaFfjdKp05WCEfYXZxfM1evIbPieNTUd1KLVhqEi0e433V5-JkEt7udCmX-p6iCj1QNdTzc1ckDnXzdR_LVDNqtYa7y5YdEBwAs8qJGt-SArsvol0riCS-CWkYlOc5PkOGgX9ia4aDpnVcMXMVBEJRkPUT1jRBw6_lUG3kelBbMVJcDoPH32fg33RXz4EYugUY4wS7YiPFrpIzQ-5WCnexjeWGr6PmNqIe8yc-QqGnv246vlyjmU0IU",
+        'authorization': "Bearer " + api_tmd,
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
@@ -189,7 +191,7 @@ def day3(lat,lon):
 
     headers = {
         'accept': "application/json",
-        'authorization': "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImIyYTFkNjY4M2MwYTBmMzcwNDNhMmNkZTA1ODUyMTliOGZhYjdiMjQzZWYzNDAyMTY2ZGY0MDQ4ZTA3MGVmYzAxNGRlMThmYmYxYTQzM2YyIn0.eyJhdWQiOiIyIiwianRpIjoiYjJhMWQ2NjgzYzBhMGYzNzA0M2EyY2RlMDU4NTIxOWI4ZmFiN2IyNDNlZjM0MDIxNjZkZjQwNDhlMDcwZWZjMDE0ZGUxOGZiZjFhNDMzZjIiLCJpYXQiOjE2Mjg5MzI0MjgsIm5iZiI6MTYyODkzMjQyOCwiZXhwIjoxNjYwNDY4NDI4LCJzdWIiOiI5NTQiLCJzY29wZXMiOltdfQ.WpR-KbNJrJm6rmcWdHHyKG-COOL1bBA_wulgD1o7-5axdOWgNhEKx4TQiUNefXE9MqCtC1bRR7-nHTyaN7awhMS6reU2qciV4ULJRKOKTRV5ap1JdpZxakkU0QvE4TMgxhLTEZYiZdl4t_Y7UiIxAQo-75hXMNu-rGoM5KknRp2NAZbnEOnrFMAVBUwi0H7woj1XH9lUXWZ8W87-vHdOO7_ng1KtH21QCGVR1xmnr2vfp3Z766BxXlb_CODOIf3RFFyZWDcZwZxgibmSOad-YAl4R5SU21zetJyMFNS_6X5W5_3S-3AVpHiyn1XoXXkryPSRyzIIFkjTyDc0dj8bC-G5im9iyN-jB47PXfVSaDa1M7t3EGOnGpJdlBO_W1WiHLRNznFAmptL35yFEvPXy9x744vAzXRxTWFGepTjpiyXKE7mOPiajaFfjdKp05WCEfYXZxfM1evIbPieNTUd1KLVhqEi0e433V5-JkEt7udCmX-p6iCj1QNdTzc1ckDnXzdR_LVDNqtYa7y5YdEBwAs8qJGt-SArsvol0riCS-CWkYlOc5PkOGgX9ia4aDpnVcMXMVBEJRkPUT1jRBw6_lUG3kelBbMVJcDoPH32fg33RXz4EYugUY4wS7YiPFrpIzQ-5WCnexjeWGr6PmNqIe8yc-QqGnv246vlyjmU0IU",
+        'authorization': "Bearer " + api_tmd,
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)

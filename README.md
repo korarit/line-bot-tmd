@@ -30,7 +30,8 @@ api key หาได้จาก https://data.tmd.go.th/nwpapi/register เม�
 
 ## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
 ##ID สำหรับแอดไลน์บอท (ID line add friend bot)
-##> @911xspfk
+> ##@911xspfk
 
 ##QRCODE ADD ไลน์ (ORCODE line add friend bot)
+
 ![Image](https://qr-official.line.me/sid/L/911xspfk.png)

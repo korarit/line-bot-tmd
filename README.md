@@ -18,6 +18,7 @@
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')
 > handler = WebhookHandler('Channel_secret')
+
 Channel_access_token หาได้จากหน้า Messaging API ใน developers.line.biz (get form page Messaging API in developers.line.biz)
 Channel_secret หาได้จากหน้า Basic setting ใน developers.line.biz (get form page Basic setting in developers.line.biz)
 
@@ -25,6 +26,7 @@ rich menu ทำใน ตัวเว็บ developers.line.biz (make rich menu
 
 ## tmd api
 > api_tmd = 'api_key'
+
 api key หาได้จาก https://data.tmd.go.th/nwpapi/register เมื่อสมัครจะได้รับ Personal Access Tokens
 
 ## Preview

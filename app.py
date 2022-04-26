@@ -17,12 +17,14 @@ from datetime import (date, timedelta, datetime)
 
 app = Flask(__name__)
 
-line_bot_api = LineBotApi('')
-handler = WebhookHandler('')
+#api line bot key
+line_bot_api = LineBotApi('Channel_access_token')
+handler = WebhookHandler('Channel_secret')
 
 data_select = 'not_have'
 
-api_tmd = 'api_key'
+#api key กรมอุตุนิยมวิทยา
+api_tmd = ''
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -38,47 +40,69 @@ def callback():
 
     if types == "text":
         message_text = str(body['events'][0]['message']['text'])
+
         if message_text == "พยากรณ์อากาศ 3ชั่วโมง":
-            data_select = 'พยากรณ์อากาศ 3ชั่วโมง'
-            line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+            if data_select == "not_have":
+                data_select = 'พยากรณ์อากาศ 3ชั่วโมง'
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+            else:
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+                data_select = "not_have"  
         elif message_text == "พยากรณ์อากาศ วันนี้":
-            data_select = 'พยากรณ์อากาศ วันนี้'
-            line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+            if data_select == "not_have":
+                data_select = 'พยากรณ์อากาศ วันนี้'
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+            else:
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+                data_select = "not_have"
+                
         elif message_text == "พยากรณ์อากาศ 3วัน":
-            data_select = 'พยากรณ์อากาศ 3วัน'
-            line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+
+            if data_select == "not_have":
+                data_select = 'พยากรณ์อากาศ 3วัน'
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+            else:
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+                data_select = "not_have"
+                
         elif message_text == "ติดต่อผู้พัฒนา":
-            line_bot_api.reply_message(Reply_token, TextSendMessage(text='====== Facebook ======\n\nhttps://www.facebook.com/krt.korarit\n\n====== Youtube =======\n\nhttps://www.youtube.com/channel/UC3ZDblNrSZRnJe_-0Zv52QA\n\n====== Github ========\n\nhttps://github.com/korarit'))
+
+            if data_select == "not_have":
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='====== Facebook ======\n\nhttps://www.facebook.com/krt.korarit\n\n====== Youtube =======\n\nhttps://www.youtube.com/channel/UC3ZDblNrSZRnJe_-0Zv52QA\n\n====== Github ========\n\nhttps://github.com/korarit'))
+            else:
+                line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+                data_select = "not_have"
+
         else:
             line_bot_api.reply_message(Reply_token, TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
     #check message type is location
     elif types == "location":
         if data_select == "not_have":
             line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาเลือก ฟังก์ชั่นการพยากรณ์อากาศ'))
-        elif data_select == "พยากรณ์อากาศ 3ชั่วโมง":
-            lat = body['events'][0]['message']['latitude']
-            lon = body['events'][0]['message']['longitude']
-            txtresult = hour3(lat,lon)
-            replyObj = TextSendMessage(text=txtresult)
-            line_bot_api.reply_message(Reply_token, replyObj)
-            data_select = "not_have"
-        elif data_select == "พยากรณ์อากาศ วันนี้":
-            lat = body['events'][0]['message']['latitude']
-            lon = body['events'][0]['message']['longitude']
-            txtresult = day_now(lat,lon)
-            replyObj = TextSendMessage(text=txtresult)
-            line_bot_api.reply_message(Reply_token, replyObj)
-            data_select = "not_have"
-        elif data_select == "พยากรณ์อากาศ 3วัน":
-            lat = body['events'][0]['message']['latitude']
-            lon = body['events'][0]['message']['longitude']
-            txtresult = day3(lat,lon)
-            replyObj = TextSendMessage(text=txtresult)
-            line_bot_api.reply_message(Reply_token, replyObj)
-            data_select = "not_have"
+        else:
+            if data_select == "พยากรณ์อากาศ 3ชั่วโมง":
+                lat = body['events'][0]['message']['latitude']
+                lon = body['events'][0]['message']['longitude']
+                txtresult = hour3(lat,lon)
+                replyObj = TextSendMessage(text=txtresult)
+                line_bot_api.reply_message(Reply_token, replyObj)
+                data_select = "not_have"
+            elif data_select == "พยากรณ์อากาศ วันนี้":
+                lat = body['events'][0]['message']['latitude']
+                lon = body['events'][0]['message']['longitude']
+                txtresult = day_now(lat,lon)
+                replyObj = TextSendMessage(text=txtresult)
+                line_bot_api.reply_message(Reply_token, replyObj)
+                data_select = "not_have"
+            elif data_select == "พยากรณ์อากาศ 3วัน":
+                lat = body['events'][0]['message']['latitude']
+                lon = body['events'][0]['message']['longitude']
+                txtresult = day3(lat,lon)
+                replyObj = TextSendMessage(text=txtresult)
+                line_bot_api.reply_message(Reply_token, replyObj)
+                data_select = "not_have"
     else:
         line_bot_api.reply_message(Reply_token, TextSendMessage(text='กรุณาส่งเป็น location!'))
-        test_1()
     return ''
 
 def hour3(lat,lon):

@@ -21,7 +21,9 @@
 > handler = WebhookHandler('Channel_secret')
 
 Channel_access_token หาได้จากหน้า Messaging API ใน developers.line.biz (get form page Messaging API in developers.line.biz)
+
 Channel_secret หาได้จากหน้า Basic setting ใน developers.line.biz (get form page Basic setting in developers.line.biz)
+
 
 rich menu ทำใน ตัวเว็บ developers.line.biz (make rich menu form developers.line.biz)
 

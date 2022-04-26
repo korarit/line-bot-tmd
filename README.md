@@ -40,6 +40,6 @@ ID สำหรับแอดไลน์บอท (ID line add friend bot)
 
 > @911xspfk
 
-QRCODE ADD ไลน์ (ORCODE line add friend bot)
+QRCODE ADD ไลน์ (QRCODE line add friend bot)
 
 ![Image](https://qr-official.line.me/sid/L/911xspfk.png)

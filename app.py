@@ -160,7 +160,9 @@ def callback():
 
     else:
 
-        line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่งเป็น location!'))
+        line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่งเป็น location และเลือกการพยากรณ์อากาศใหม่อีกครั้ง!'))
+
+        data_select = None
 
     return ''
 

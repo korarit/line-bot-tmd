@@ -14,6 +14,7 @@
 * requests
 * json
 * datetime
+* pytz
 
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')

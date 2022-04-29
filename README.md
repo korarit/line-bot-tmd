@@ -1,20 +1,34 @@
-# line-bot-tmd V2.0
+# line-bot-tmd V2.0 (Develop Processing)
 ### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา V.2
 
-ความสามารถของระบบ (Function)
-* ใช้ location ในการค้นหาข้อมูล
-  * พยากรณ์อากาศ 3ชั่วโมง
-  * พยากรณ์อากาศ วันนี้
-  * พยากรณ์อากาศ 3วัน
-  * ส่งข้อความ link ติดต่อผู้พัฒนา
+ความสามารถของระบบ line bot (Function)
+* ใช้ location ในการค้นหาข้อมูล , ใช้ ข้อมูลจาก longdomap เป็นข้อความ
+  * พยากรณ์อากาศ รายชั่วโมง เลือกได้ 3ชั่วโมง 6ชั่วโมง 9ชั่วโมง
+   * เป็นภาพ infographic (html to image)
+  * พยากรณ์อากาศ รายวัน เลือกได้ 1วัน 3วัน 7วัน
+   * เป็นภาพ infographic (html to image)
+  * ข่าวการพยากรณ์อากาศจากกรมอุตุนืยมวืทยา
+   * เป็นภาพ infographic (html to image)
 
-## requestment ของตัวระบบ
+ความสามารถของระบบจัดการ (bankend Function)
+* line bot control web
+ * brocast function
+ * disble bot
+ * block user
+* data 
+ * เก็บข้อมูลการ requset รายวัน รายอาทิตย์ รายเดือน
+* security
+ * discord log
+ * block spam
+
+## requestment ของตัวระบบ line bot
 * flask
 * line-bot-sdk
 * requests
 * json
 * datetime
 * pytz
+* pyimgur
 
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')

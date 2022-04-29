@@ -1,5 +1,5 @@
-# line-bot-tmd
-### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา
+# line-bot-tmd V2.0
+### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา V.2
 
 ความสามารถของระบบ (Function)
 * ใช้ location ในการค้นหาข้อมูล
@@ -14,6 +14,7 @@
 * requests
 * json
 * datetime
+* pytz
 
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')
@@ -32,14 +33,4 @@ rich menu ทำใน ตัวเว็บ developers.line.biz (make rich menu
 
 api key หาได้จาก https://data.tmd.go.th/nwpapi/register เมื่อสมัครจะได้รับ Personal Access Tokens
 
-## Preview
-![Image](https://i.imgur.com/shRM4s2.png)
-
-## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
-ID สำหรับแอดไลน์บอท (ID line add friend bot)
-
-> @911xspfk
-
-QRCODE ADD ไลน์ (QRCODE line add friend bot)
-
-![Image](https://qr-official.line.me/sid/L/911xspfk.png)
+## Develop Processing

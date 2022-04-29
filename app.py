@@ -13,6 +13,7 @@ from linebot.models import (
 
 import requests
 import json
+import pytz
 
 from datetime import (date, timedelta, datetime)
 
@@ -20,9 +21,7 @@ from datetime import (date, timedelta, datetime)
 app = Flask(__name__)
 
 #api line bot key
-
 line_bot_api = LineBotApi('Channel_access_token')
-
 handler = WebhookHandler('Channel_secret')
 
 #api key กรมอุตุนิยมวิทยา
@@ -30,6 +29,9 @@ api_tmd = 'api_key'
 
 #data_select สำหรับใช้ในการเลือก function
 data_select = None
+
+#set timezone
+tz = pytz.timezone('Asia/Bangkok')
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -166,7 +168,6 @@ def callback():
 def hour3(lat,lon):
 
         #ดึงวันที่ปัจจุบัน
-
         today = date.today()
 
         day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
@@ -174,7 +175,7 @@ def hour3(lat,lon):
 
         #ดึงเวลาปัจจุบัน
 
-        time_now = datetime.now()
+        time_now = datetime.now().astimezone(tz)
 
         current_time = time_now.strftime("%H") #วันทีสำหรับใช้ในการดึงข้อมูล
 
@@ -185,13 +186,13 @@ def hour3(lat,lon):
 
         #1 ชั่วโมงถัดไป
 
-        next_time2 = datetime.now() + timedelta(hours=1)
+        next_time2 = datetime.now().astimezone(tz) + timedelta(hours=1)
 
         time2_text = next_time2.strftime("%H:%M:%S")  #เวลาสำหรับใช้ในการส่งหา user
 
         #2 ชั่วโมงถัดไป
 
-        next_time3 = datetime.now() + timedelta(hours=2)
+        next_time3 = datetime.now().astimezone(tz) + timedelta(hours=2)
 
         time3_text = next_time3.strftime("%H:%M:%S") #เวลาสำหรับใช้ในการส่งหา user
 
@@ -454,5 +455,4 @@ def get_cond(cond):
 
 
 if __name__ == "__main__":
-
     app.run()

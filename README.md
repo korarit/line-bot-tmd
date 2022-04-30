@@ -16,12 +16,11 @@
 * line bot control web
   * brocast function
   * disble bot
-  * block user
+  * change image in menu
 * data 
   * เก็บข้อมูลการ requset รายวัน รายอาทิตย์ รายเดือน
 * security
   * discord log
-  * block spam
 
 ## requestment library ของตัวระบบ line bot
 * flask

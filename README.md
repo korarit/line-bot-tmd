@@ -14,7 +14,7 @@
 
 ความสามารถของระบบจัดการ (bankend Function)
 * line bot control web
-  * brocast function
+  * broadcast function
   * disble bot
   * change image in menu
 * data 

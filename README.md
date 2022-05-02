@@ -15,12 +15,6 @@
 ความสามารถของระบบจัดการ (bankend Function)
 * line bot control web
   * broadcast function
-  * disble bot
-  * change image in menu
-* data 
-  * เก็บข้อมูลการ requset รายวัน รายอาทิตย์ รายเดือน
-* security
-  * discord log
 
 ## requestment library ของตัวระบบ line bot
 * flask

@@ -6,11 +6,8 @@
 ความสามารถของระบบ line bot (Function)
 * ใช้ location ในการค้นหาข้อมูล , ใช้ ข้อมูลจาก longdomap เป็นข้อความ
   * พยากรณ์อากาศ รายชั่วโมง เลือกได้ 3ชั่วโมง 6ชั่วโมง 9ชั่วโมง
-    * เป็นภาพ infographic (html to image)
   * พยากรณ์อากาศ รายวัน เลือกได้ 1วัน 3วัน 7วัน
-    * เป็นภาพ infographic (html to image)
   * ข่าวการพยากรณ์อากาศจากกรมอุตุนืยมวืทยา
-    * เป็นภาพ infographic (html to image)
 
 ความสามารถของระบบจัดการ (bankend Function)
 * line bot control web
@@ -23,7 +20,6 @@
 * json
 * datetime
 * pytz
-* pyimgur
 
 ## programming language
 backend

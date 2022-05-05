@@ -38,7 +38,7 @@ username_sql = ""
 databasename_sql = ""
 password_sql = ""
 server_sql = ""
-port_sql = ""
+port_sql = "3306"
 
 #menu_select สำหรับใช้ในการเลือก menu
 menu_select = None
@@ -76,6 +76,7 @@ def callback():
         if message_text == "พยากรณ์อากาศ รายชั่วโมง":
             if menu_select is None:
                 menu_select = 2
+
                 carousel_template_message = TemplateSendMessage(
                                                 alt_text='Menu',
                                                 template=CarouselTemplate(
@@ -116,14 +117,15 @@ def callback():
 
                 line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
-                select_function = None
                 menu_select = None
+                select_function = None
                 count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
         elif message_text == "พยากรณ์อากาศ รายวัน":
             if menu_select is None:
                 menu_select = 2
+
                 carousel_template_message = TemplateSendMessage(
                                                 alt_text='Menu',
                                                 template=CarouselTemplate(
@@ -164,15 +166,16 @@ def callback():
 
                 line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
-                select_function = None
                 menu_select = None
+                select_function = None
                 count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
 
         elif message_text == "ข่าวสภาพอากาศ":
             if menu_select is None:
                 menu_select = 2
+
                 carousel_template_message = TemplateSendMessage(
                                                 alt_text='Menu',
                                                 template=CarouselTemplate(
@@ -203,17 +206,17 @@ def callback():
 
                 line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
-                select_function = None
                 menu_select = None
+                select_function = None
                 count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
                     
         elif message_text == "ติดต่อผู้พัฒนา":
             if menu_select is None:
                 line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='====== Facebook ======\n\nhttps://www.facebook.com/krt.korarit\n\n====== Youtube =======\n\nhttps://www.youtube.com/channel/UC3ZDblNrSZRnJe_-0Zv52QA\n\n====== Github ========\n\nhttps://github.com/korarit'))
             else:
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
         elif message_text in list_message_hour:
             if menu_select == 2:
                 get_count = message_text.split("_")
@@ -221,12 +224,12 @@ def callback():
 
                 select_function = 'hours'
                 line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาแชร์ location'))
+                menu_select = None
             else:
                 select_function = None
-                menu_select = None
                 count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
         elif message_text in list_message_day:
             if menu_select == 2:
                 get_count = message_text.split("_")
@@ -234,12 +237,12 @@ def callback():
 
                 select_function = 'day'
                 line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาแชร์ location'))
+                menu_select = None
             else:
                 select_function = None
-                menu_select = None
                 count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
         elif message_text in list_message_news:
             if menu_select == 2:
 
@@ -264,7 +267,11 @@ def callback():
                 line_bot_api.reply_message(body['events'][0]['replyToken'], ImageSendMessage(original_content_url=result[0], preview_image_url=result[0]))
 
             else:
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                count_data = None
+
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+        else:
+            line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
     elif types == "location":
 
         if select_function is not None:

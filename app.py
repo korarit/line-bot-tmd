@@ -27,18 +27,18 @@ app = Flask(__name__, template_folder='html')
 app.static_folder = 'static'
 
 #api line bot key
-line_bot_api = LineBotApi('pEJAYbg+U8EYU2zn5++piFFeQWXfbH+BxuYQbZngrmcM5jHaZtLJWjjhS+76dEXd1rPWWhtIsnldxMkCgQ1astbWGdwlydNvu1je5rJZOV4nCY8LcpCei07XEtkX1vqVjOmRKlchnoxMLz0PFTd7nAdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('db61e2b40b3147b51b5d846d37d78234')
+line_bot_api = LineBotApi('')
+handler = WebhookHandler('')
 
 #api key กรมอุตุนิยมวิทยา
-api_tmd = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImIyYTFkNjY4M2MwYTBmMzcwNDNhMmNkZTA1ODUyMTliOGZhYjdiMjQzZWYzNDAyMTY2ZGY0MDQ4ZTA3MGVmYzAxNGRlMThmYmYxYTQzM2YyIn0.eyJhdWQiOiIyIiwianRpIjoiYjJhMWQ2NjgzYzBhMGYzNzA0M2EyY2RlMDU4NTIxOWI4ZmFiN2IyNDNlZjM0MDIxNjZkZjQwNDhlMDcwZWZjMDE0ZGUxOGZiZjFhNDMzZjIiLCJpYXQiOjE2Mjg5MzI0MjgsIm5iZiI6MTYyODkzMjQyOCwiZXhwIjoxNjYwNDY4NDI4LCJzdWIiOiI5NTQiLCJzY29wZXMiOltdfQ.WpR-KbNJrJm6rmcWdHHyKG-COOL1bBA_wulgD1o7-5axdOWgNhEKx4TQiUNefXE9MqCtC1bRR7-nHTyaN7awhMS6reU2qciV4ULJRKOKTRV5ap1JdpZxakkU0QvE4TMgxhLTEZYiZdl4t_Y7UiIxAQo-75hXMNu-rGoM5KknRp2NAZbnEOnrFMAVBUwi0H7woj1XH9lUXWZ8W87-vHdOO7_ng1KtH21QCGVR1xmnr2vfp3Z766BxXlb_CODOIf3RFFyZWDcZwZxgibmSOad-YAl4R5SU21zetJyMFNS_6X5W5_3S-3AVpHiyn1XoXXkryPSRyzIIFkjTyDc0dj8bC-G5im9iyN-jB47PXfVSaDa1M7t3EGOnGpJdlBO_W1WiHLRNznFAmptL35yFEvPXy9x744vAzXRxTWFGepTjpiyXKE7mOPiajaFfjdKp05WCEfYXZxfM1evIbPieNTUd1KLVhqEi0e433V5-JkEt7udCmX-p6iCj1QNdTzc1ckDnXzdR_LVDNqtYa7y5YdEBwAs8qJGt-SArsvol0riCS-CWkYlOc5PkOGgX9ia4aDpnVcMXMVBEJRkPUT1jRBw6_lUG3kelBbMVJcDoPH32fg33RXz4EYugUY4wS7YiPFrpIzQ-5WCnexjeWGr6PmNqIe8yc-QqGnv246vlyjmU0IU'
+api_tmd = ''
 
 #Database SQL
-username_sql = "9zQtx0JF4V"
-databasename_sql = "9zQtx0JF4V"
-password_sql = "AFNfx1fcfP"
-server_sql = "remotemysql.com"
-port_sql = "3306"
+username_sql = ""
+databasename_sql = ""
+password_sql = ""
+server_sql = ""
+port_sql = ""
 
 #menu_select สำหรับใช้ในการเลือก menu
 menu_select = None

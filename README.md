@@ -38,7 +38,7 @@ rich menu ทำใน ตัวเว็บ developers.line.biz (make rich menu
 api key หาได้จาก https://data.tmd.go.th/nwpapi/register เมื่อสมัครจะได้รับ Personal Access Tokens
 
 ## Preview
-![Image](https://i.imgur.com/shRM4s2.png)
+![Image](https://i.imgur.com/huowHNe.png)
 
 ## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
 ID สำหรับแอดไลน์บอท (ID line add friend bot)

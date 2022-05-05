@@ -14,6 +14,11 @@
 * requests
 * json
 * datetime
+* pymysql
+* os
+* slugify
+* BeautifulSoup
+* pytz
 
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')
@@ -42,4 +47,4 @@ ID สำหรับแอดไลน์บอท (ID line add friend bot)
 
 QRCODE ADD ไลน์ (QRCODE line add friend bot)
 
-![Image](https://qr-official.line.me/sid/L/911xspfk.png)
+![Image](https://qr-official.line.me/sid/L/038asklf.png)

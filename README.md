@@ -1,33 +1,19 @@
-# line-bot-tmd V2.0 (Develop Processing)
-### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา V.2
+# line-bot-tmd
+### line bot รายงานสภาพอากาศ ผ่าน การส่ง location ให้บอท โดยใช้ข้อมูลจาก api ของกรมอุตุนิยมวิทยา
 
+ความสามารถของระบบ (Function)
+* ใช้ location ในการค้นหาข้อมูล
+  * พยากรณ์อากาศ 3ชั่วโมง
+  * พยากรณ์อากาศ วันนี้
+  * พยากรณ์อากาศ 3วัน
+  * ส่งข้อความ link ติดต่อผู้พัฒนา
 
-
-ความสามารถของระบบ line bot (Function)
-* ใช้ location ในการค้นหาข้อมูล , ใช้ ข้อมูลจาก longdomap เป็นข้อความ
-  * พยากรณ์อากาศ รายชั่วโมง เลือกได้ 3ชั่วโมง 6ชั่วโมง 9ชั่วโมง
-  * พยากรณ์อากาศ รายวัน เลือกได้ 1วัน 3วัน 7วัน
-  * ข่าวการพยากรณ์อากาศจากกรมอุตุนืยมวืทยา
-
-ความสามารถของระบบจัดการ (bankend Function)
-* line bot control web
-  * broadcast function
-
-## requestment library ของตัวระบบ line bot
+## requestment ของตัวระบบ
 * flask
 * line-bot-sdk
 * requests
 * json
 * datetime
-* pytz
-
-## programming language
-backend
-* Python 3.10
-
-fontend
-* html
-* bootstrap
 
 ## line api
 > line_bot_api = LineBotApi('Channel_access_token')
@@ -46,4 +32,14 @@ rich menu ทำใน ตัวเว็บ developers.line.biz (make rich menu
 
 api key หาได้จาก https://data.tmd.go.th/nwpapi/register เมื่อสมัครจะได้รับ Personal Access Tokens
 
-## Develop Processing
+## Preview
+![Image](https://i.imgur.com/shRM4s2.png)
+
+## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
+ID สำหรับแอดไลน์บอท (ID line add friend bot)
+
+> @911xspfk
+
+QRCODE ADD ไลน์ (QRCODE line add friend bot)
+
+![Image](https://qr-official.line.me/sid/L/911xspfk.png)

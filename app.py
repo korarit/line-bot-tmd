@@ -1,4 +1,4 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, render_template, session, url_for, redirect, flash
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -8,27 +8,46 @@ from linebot.exceptions import (
 )
 
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, ImageMessage, TextSendMessage, ImageSendMessage, TemplateSendMessage, CarouselColumn, MessageAction, CarouselTemplate
 )
+
+from bs4 import BeautifulSoup
 
 import requests
 import json
 import pytz
+import os
+import pymysql
 
 from datetime import (date, timedelta, datetime)
 
+from slugify import slugify
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='html')
+app.static_folder = 'static'
 
 #api line bot key
-line_bot_api = LineBotApi('Z73uaOfQbjn3zjPJq9NQ9lVesn3YbDmm/3aQb2nktCKCWHmHSxQsCQv8Wz8oh1fgm/74pzVHHJee9Te2jiWAAFcvK5MwRIo3b4ne68e+3mIJ0qLBGXGJcXmWLYHe7kVpdJkekF3kOSLRfawbFmsYEQdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('60c9d887805e00521665083b6735ddf7')
+line_bot_api = LineBotApi('pEJAYbg+U8EYU2zn5++piFFeQWXfbH+BxuYQbZngrmcM5jHaZtLJWjjhS+76dEXd1rPWWhtIsnldxMkCgQ1astbWGdwlydNvu1je5rJZOV4nCY8LcpCei07XEtkX1vqVjOmRKlchnoxMLz0PFTd7nAdB04t89/1O/w1cDnyilFU=')
+handler = WebhookHandler('db61e2b40b3147b51b5d846d37d78234')
 
 #api key กรมอุตุนิยมวิทยา
 api_tmd = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImIyYTFkNjY4M2MwYTBmMzcwNDNhMmNkZTA1ODUyMTliOGZhYjdiMjQzZWYzNDAyMTY2ZGY0MDQ4ZTA3MGVmYzAxNGRlMThmYmYxYTQzM2YyIn0.eyJhdWQiOiIyIiwianRpIjoiYjJhMWQ2NjgzYzBhMGYzNzA0M2EyY2RlMDU4NTIxOWI4ZmFiN2IyNDNlZjM0MDIxNjZkZjQwNDhlMDcwZWZjMDE0ZGUxOGZiZjFhNDMzZjIiLCJpYXQiOjE2Mjg5MzI0MjgsIm5iZiI6MTYyODkzMjQyOCwiZXhwIjoxNjYwNDY4NDI4LCJzdWIiOiI5NTQiLCJzY29wZXMiOltdfQ.WpR-KbNJrJm6rmcWdHHyKG-COOL1bBA_wulgD1o7-5axdOWgNhEKx4TQiUNefXE9MqCtC1bRR7-nHTyaN7awhMS6reU2qciV4ULJRKOKTRV5ap1JdpZxakkU0QvE4TMgxhLTEZYiZdl4t_Y7UiIxAQo-75hXMNu-rGoM5KknRp2NAZbnEOnrFMAVBUwi0H7woj1XH9lUXWZ8W87-vHdOO7_ng1KtH21QCGVR1xmnr2vfp3Z766BxXlb_CODOIf3RFFyZWDcZwZxgibmSOad-YAl4R5SU21zetJyMFNS_6X5W5_3S-3AVpHiyn1XoXXkryPSRyzIIFkjTyDc0dj8bC-G5im9iyN-jB47PXfVSaDa1M7t3EGOnGpJdlBO_W1WiHLRNznFAmptL35yFEvPXy9x744vAzXRxTWFGepTjpiyXKE7mOPiajaFfjdKp05WCEfYXZxfM1evIbPieNTUd1KLVhqEi0e433V5-JkEt7udCmX-p6iCj1QNdTzc1ckDnXzdR_LVDNqtYa7y5YdEBwAs8qJGt-SArsvol0riCS-CWkYlOc5PkOGgX9ia4aDpnVcMXMVBEJRkPUT1jRBw6_lUG3kelBbMVJcDoPH32fg33RXz4EYugUY4wS7YiPFrpIzQ-5WCnexjeWGr6PmNqIe8yc-QqGnv246vlyjmU0IU'
 
-#data_select สำหรับใช้ในการเลือก function
-data_select = None
+#Database SQL
+username_sql = "9zQtx0JF4V"
+databasename_sql = "9zQtx0JF4V"
+password_sql = "AFNfx1fcfP"
+server_sql = "remotemysql.com"
+port_sql = "3306"
+
+#menu_select สำหรับใช้ในการเลือก menu
+menu_select = None
+
+#menu_select สำหรับใช้ในการเลือก function
+count_data = None
+
+#menu_select สำหรับใช้ในการเลือก function
+select_function = None
 
 #set timezone
 tz = pytz.timezone('Asia/Bangkok')
@@ -36,173 +55,289 @@ tz = pytz.timezone('Asia/Bangkok')
 @app.route("/callback", methods=['POST'])
 def callback():
 
-    #ประกาศตัวแปร data_select เป็น global ให้ updateได้
-    global data_select
+    #ประกาศตัวแปร menu_select , select_function , count_data เป็น global ให้ updateได้
+    global menu_select
+    global select_function
+    global count_data
 
     # get request body as text
     body = request.json
 
     #type message form user
     types = body['events'][0]['message']['type']
+    list_message_hour = [ '3_hours', '6_hours', '9_hours' ]
+    list_message_day = ['1_day', '3_days', '7_days']
+    list_message_news = ['1_news','2_news']
 
     if types == "text":
 
         message_text = str(body['events'][0]['message']['text'])
 
-        if message_text == "พยากรณ์อากาศ 3ชั่วโมง":
+        if message_text == "พยากรณ์อากาศ รายชั่วโมง":
+            if menu_select is None:
+                menu_select = 2
+                carousel_template_message = TemplateSendMessage(
+                                                alt_text='Menu',
+                                                template=CarouselTemplate(
+                                                    columns=[
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ 3 ชั่วโมง',
+                                                            text='พยากรณ์อากาศ ชั่วโมงปัจจุบัน และอีก 2ชั่วโมงถัดไป',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก 3 ชั่วโมง',
+                                                                    text='3_hours'
+                                                                )
+                                                            ]
+                                                        ),
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ 6 ชั่วโมง',
+                                                            text='พยากรณ์อากาศ ชั่วโมงปัจจุบัน และอีก 5ชั่วโมงถัดไป',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก 6 ชั่วโมง',
+                                                                    text='6_hours'
+                                                                )
+                                                            ]
+                                                        ),
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ 9 ชั่วโมง',
+                                                            text='พยากรณ์อากาศ ชั่วโมงปัจจุบัน และอีก 8ชั่วโมงถัดไป',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก 9 ชั่วโมง',
+                                                                    text='9_hours'
+                                                                )
+                                                            ]
+                                                        )
+                                                    ]
+                                                )
+                                            )
 
-            if data_select is None:
-
-                data_select = 'พยากรณ์อากาศ 3ชั่วโมง'
-
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
-
+                line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
+                select_function = None
+                menu_select = None
+                count_data = None
 
-                data_select = None
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+        elif message_text == "พยากรณ์อากาศ รายวัน":
+            if menu_select is None:
+                menu_select = 2
+                carousel_template_message = TemplateSendMessage(
+                                                alt_text='Menu',
+                                                template=CarouselTemplate(
+                                                    columns=[
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ วันนี้',
+                                                            text='พยากรณ์อากาศ วันนี้',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก วันนี้',
+                                                                    text='1_day'
+                                                                )
+                                                            ]
+                                                        ),
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ 3 วัน',
+                                                            text='พยากรณ์อากาศ วันนี้ และอีก 2 วันถัดไป',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก 3 วัน',
+                                                                    text='3_days'
+                                                                )
+                                                            ]
+                                                        ),
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศ 7 วัน',
+                                                            text='พยากรณ์อากาศ วันนี้ และอีก 6 วันถัดไป',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก 7 วัน',
+                                                                    text='7_days'
+                                                                )
+                                                            ]
+                                                        )
+                                                    ]
+                                                )
+                                            )
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
-
-        elif message_text == "พยากรณ์อากาศ วันนี้":
-
-            if data_select is None:
-
-                data_select = 'พยากรณ์อากาศ วันนี้'
-
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
-
+                line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
+                select_function = None
+                menu_select = None
+                count_data = None
 
-                data_select = None
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
+        elif message_text == "ข่าวสภาพอากาศ":
+            if menu_select is None:
+                menu_select = 2
+                carousel_template_message = TemplateSendMessage(
+                                                alt_text='Menu',
+                                                template=CarouselTemplate(
+                                                    columns=[
+                                                        CarouselColumn(
+                                                            title='พยากรณ์อากาศประจำวัน	',
+                                                            text='Infographic พยากรณ์อากาศประจำวัน จากกรมอุตุนิยมวิทยา',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก',
+                                                                    text='1_news'
+                                                                )
+                                                            ]
+                                                        ),
+                                                        CarouselColumn(
+                                                            title='เตือนภัยพื้นที่เสียงภัยฝนหนัก',
+                                                            text='Infographic เตือนภัยพื้นที่เสียงภัยฝนหนัก จากกรมอุตุนิยมวิทยา',
+                                                            actions=[
+                                                                MessageAction(
+                                                                    label='เลือก',
+                                                                    text='2_news'
+                                                                )
+                                                            ]
+                                                        )
+                                                    ]
+                                                )
+                                            )
 
-        elif message_text == "พยากรณ์อากาศ 3วัน":
-
-            if data_select is None:
-
-                data_select = 'พยากรณ์อากาศ 3วัน'
-
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่ง location เพื่อค้นหาข้อมูล'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], carousel_template_message)
             else:
+                select_function = None
+                menu_select = None
+                count_data = None
 
-                data_select = None
-                
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
-
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                    
         elif message_text == "ติดต่อผู้พัฒนา":
-
-            if data_select is None:
-
+            if menu_select is None:
                 line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='====== Facebook ======\n\nhttps://www.facebook.com/krt.korarit\n\n====== Youtube =======\n\nhttps://www.youtube.com/channel/UC3ZDblNrSZRnJe_-0Zv52QA\n\n====== Github ========\n\nhttps://github.com/korarit'))
-            
             else:
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+        elif message_text in list_message_hour:
+            if menu_select == 2:
+                get_count = message_text.split("_")
+                count_data = int(get_count[0]) - 1
 
-                data_select = None
+                select_function = 'hours'
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาแชร์ location'))
+            else:
+                select_function = None
+                menu_select = None
+                count_data = None
 
-                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือกใหม่อีกครั้ง'))
-        else:
-            line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+        elif message_text in list_message_day:
+            if menu_select == 2:
+                get_count = message_text.split("_")
+                count_data = int(get_count[0]) - 1
 
-    #check message type is location
+                select_function = 'day'
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาแชร์ location'))
+            else:
+                select_function = None
+                menu_select = None
+                count_data = None
 
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
+        elif message_text in list_message_news:
+            if menu_select == 2:
+
+                menu_select = None
+                #ดึงวันที่ปัจจุบัน
+                today = date.today()
+                day = str(today.strftime("%Y-%m-%d")) #วันทีสำหรับใช้ในการดึงข้อมูล
+
+                get_count = message_text.split("_")
+                count_datas = int(get_count[0])
+
+                conn = pymysql.connect(host=server_sql, user=username_sql, password=password_sql, database=databasename_sql)
+                cur = conn.cursor()
+                sql = "SELECT link FROM news Where date=%s and type=%s"
+                cur.execute(sql, (day, count_datas))
+
+                result = cur.fetchone()
+
+                print(result)
+                conn.close()
+
+                line_bot_api.reply_message(body['events'][0]['replyToken'], ImageSendMessage(original_content_url=result[0], preview_image_url=result[0]))
+
+            else:
+                line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='ไม่สามารถพิมพ์ข้อความเพื่อคุยกับ บอทได้ในขณะนี้'))
     elif types == "location":
 
-        if data_select is not None:
+        if select_function is not None:
 
-            if data_select == "พยากรณ์อากาศ 3ชั่วโมง":
-
-                lat = body['events'][0]['message']['latitude']
-
-                lon = body['events'][0]['message']['longitude']
-
-                txtresult = hour3(lat,lon)
-
-                replyObj = TextSendMessage(text=txtresult)
-
-                line_bot_api.reply_message(body['events'][0]['replyToken'], replyObj)
-
-                data_select = None
-
-            elif data_select == "พยากรณ์อากาศ วันนี้":
+            if select_function == "hours":
 
                 lat = body['events'][0]['message']['latitude']
 
                 lon = body['events'][0]['message']['longitude']
 
-                txtresult = day_now(lat,lon)
+                txtresult = get_hour(lat,lon,count_data)
 
                 replyObj = TextSendMessage(text=txtresult)
 
                 line_bot_api.reply_message(body['events'][0]['replyToken'], replyObj)
 
-                data_select = None
+                print(str(lat) +" , "+ str(lon))
 
-            elif data_select == "พยากรณ์อากาศ 3วัน":
+                menu_select = None
+                select_function = None
+                count_data = None
+
+            elif select_function == "day":
 
                 lat = body['events'][0]['message']['latitude']
 
                 lon = body['events'][0]['message']['longitude']
 
-                txtresult = day3(lat,lon)
+                txtresult = get_day(lat,lon,count_data)
 
                 replyObj = TextSendMessage(text=txtresult)
 
                 line_bot_api.reply_message(body['events'][0]['replyToken'], replyObj)
 
-                data_select = None
+                menu_select = None
+                select_function = None
+                count_data = None
 
         else:
 
-            line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือก ฟังก์ชั่นการพยากรณ์อากาศ'))
+            line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาเลือก menu ใหม่อีกครั้ง'))
 
-            data_select = None
-
+            menu_select = None
+            select_function = None
+            count_data = None
     else:
 
-        line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่งเป็น location!'))
+        line_bot_api.reply_message(body['events'][0]['replyToken'], TextSendMessage(text='กรุณาส่งเป็น location และกรุณาเลือก menu ใหม่อีกครั้ง!'))
+
+        menu_select = None
+        select_function = None
+        count_data = None
 
     return ''
 
 
-def hour3(lat,lon):
+def get_hour(lat,lon,hour):
 
         #ดึงวันที่ปัจจุบัน
         today = date.today()
 
         day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
 
-
-        #ดึงเวลาปัจจุบัน
-
-        time_now = datetime.now().astimezone(tz)
-
-        current_time = time_now.strftime("%H") #วันทีสำหรับใช้ในการดึงข้อมูล
-
-        #วันทีสำหรับใช้ในการส่งหา user
-
-        time_text = time_now.strftime("%H:%M:%S") #เวลาปัจจุบัน
-
-
-        #1 ชั่วโมงถัดไป
-
-        next_time2 = datetime.now().astimezone(tz) + timedelta(hours=1)
-
-        time2_text = next_time2.strftime("%H:%M:%S")  #เวลาสำหรับใช้ในการส่งหา user
-
-        #2 ชั่วโมงถัดไป
-
-        next_time3 = datetime.now().astimezone(tz) + timedelta(hours=2)
-
-        time3_text = next_time3.strftime("%H:%M:%S") #เวลาสำหรับใช้ในการส่งหา user
-
+        #ดึงชั่วโมงปัจจุบัน
+        hour_now = datetime.now().astimezone(tz)
+        hournow_text = hour_now.strftime("%H")
 
         #ดึงข้อมูลจาก api กรมอุตุนิยมวิทยา
 
         url = "https://data.tmd.go.th/nwpapi/v1/forecast/location/hourly/at"
 
 
-        querystring = {"lat":lat, "lon":lon, "fields":"tc,rain,cond", "date":day, "hour":"8", "duration":"3"}
+        querystring = {"lat":lat, "lon":lon, "fields":"tc,rain,cond", "date":day, "hour":hournow_text, "duration":"9"}
 
 
         headers = {
@@ -217,58 +352,48 @@ def hour3(lat,lon):
         response = requests.request("GET", url, headers=headers, params=querystring)
 
 
-        #นำข้อ
-
+        #นำข้อมูลมาใช้
         getdata = json.loads(response.text)
 
         print(response.text)
 
+        i = 0
+        data_return = ''
+        while i <= hour:
+            #ดึงชั่วโมงถัดไป
+            next_time = datetime.now().astimezone(tz) + timedelta(hours=i)
+            time_text = next_time.strftime("%H:%M:%S")
 
-        ##นำข้อมูลใน array getdata มาใช้##
+            ##นำข้อมูลใน array getdata มาใช้##
+            #ดึงข้อมูล สภาพอากาศทั่วไป
+            cond_time = get_cond(getdata['WeatherForecasts'][0]['forecasts'][i]['data']['cond'])
 
-        #ดึงข้อมูล สภาพอากาศทั่วไป ของชั่วโมงปัจจุบัน และ 2ชั่วโมงถัดไป แล้วแปลงเป็นคำที่เข้าใจโดยใช้ fuction get_cond
+            #ดึงข้อมูล อุณหภูมิ 
+            tc_time = getdata['WeatherForecasts'][0]['forecasts'][i]['data']['tc']
 
-        cond_time1 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][0]['data']['cond'])
+            #ดึงข้อมูล ฝนสะสม 
+            rain_time = getdata['WeatherForecasts'][0]['forecasts'][i]['data']['rain']
 
-        cond_time2 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][1]['data']['cond'])
+            data_returns = 'เวลา {0}น. \nสภาพอากาศ : {1} \nอุณหภูมิ : {2}  °C\nปริมาณฝนสะสม : {3}  mm\n=======================\n'.format(time_text, cond_time, tc_time, rain_time)
+            data_return = data_return + data_returns
 
-        cond_time3 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][2]['data']['cond'])
-
-
-        #ดึงข้อมูล อุณหภูมิ ของชั่วโมงปัจจุบัน และ 2ชั่วโมงถัดไป หน้วยเป็นองศา
-
-        tc_time1 = getdata['WeatherForecasts'][0]['forecasts'][0]['data']['tc']
-
-        tc_time2 = getdata['WeatherForecasts'][0]['forecasts'][1]['data']['tc']
-
-        tc_time3 = getdata['WeatherForecasts'][0]['forecasts'][2]['data']['tc']
-
-
-        data_return = 'เวลา ' + time_text + '\nสภาพอากาศ : ' + cond_time1 + '\nอุณหภูมิ : ' + str(tc_time1) + ' °C\n======================='+'\nเวลา ' + time2_text + '\nสภาพอากาศ : ' + cond_time2 + '\nอุณหภูมิ : ' + str(tc_time2) + ' °C\n======================='+'\nเวลา ' + time3_text + '\nสภาพอากาศ : ' + cond_time3 + '\nอุณหภูมิ : ' + str(tc_time3) + ' °C\n======================='
-
+            i = i + 1
         return data_return
 
-
-def day_now(lat,lon):
+def get_day(lat,lon,day_count):
     
-
     #ดึงวันที่ปัจจุบัน
 
     today = date.today()
 
     day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
 
-    #วันทีสำหรับใช้ในการส่งหา user
-
-    day_text = today.strftime("%d / %m / %Y") #วันปัจจุบัน
-
-
     #ดึงข้อมูลจาก api กรมอุตุนิยมวิทยา
 
     url = "https://data.tmd.go.th/nwpapi/v1/forecast/location/daily/at"
 
 
-    querystring = {"lat":lat, "lon":lon, "fields":"tc_min,tc_max,rain,cond", "date":day, "hour":"8", "duration":"1"}
+    querystring = {"lat":lat, "lon":lon, "fields":"tc_min,tc_max,rain,cond", "date":day, "hour":"8", "duration":"8"}
 
 
     headers = {
@@ -279,129 +404,37 @@ def day_now(lat,lon):
 
     }
 
-
     response = requests.request("GET", url, headers=headers, params=querystring)
 
-
-    #นำข้อ
-
+    #นำข้อมูลมาเป็น array
     getdata = json.loads(response.text)
-
-
-    ##นำข้อมูลใน array getdata มาใช้##
-
-    #ดึงข้อมูล สภาพอากาศทั่วไป ของวันปัจจุบันและวันถัดไป แล้วแปลงเป็นคำที่เข้าใจโดยใช้ fuction get_cond
-
-    cond_data1 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][0]['data']['cond'])
-
-
-    #ดึงข้อมูล อุณหภูมิต่ำสุด ของวันปัจจุบันและวันถัดไป หน้วยเป็นองศา
-
-    tcmin_data1 = getdata['WeatherForecasts'][0]['forecasts'][0]['data']['tc_min']
-
-
-    #ดึงข้อมูล อุณหภูมิสูงสุด ของวันปัจจุบันและวันถัดไป หน้วยเป็นองศา
-
-    tcmax_data1 = getdata['WeatherForecasts'][0]['forecasts'][0]['data']['tc_max']
-
 
     print(response.text)
 
+    i = 0
+    data_return = ''
+    while i <= day_count:
+        #วันที่
+        next_day = date.today() + timedelta(days=i)
+        day_text = next_day.strftime("%d / %m / %Y")
 
-    data_return = 'วันที่ ' + day_text + '\nสภาพอากาศ : ' + cond_data1 + '\nอุณหภูมิต่ำสุด : ' + str(tcmin_data1) + ' °C\nอุณหภูมิสูงสุด : ' + str(tcmax_data1) + ' °C\n======================='
+        ##นำข้อมูลใน array getdata มาใช้##
+        #ดึงข้อมูล สภาพอากาศทั่วไป
+        cond_time = get_cond(getdata['WeatherForecasts'][0]['forecasts'][i]['data']['cond'])
 
+        #ดึงข้อมูล อุณหภูมิ 
+        tcmin_data = getdata['WeatherForecasts'][0]['forecasts'][i]['data']['tc_min']
+
+        tcmax_data = getdata['WeatherForecasts'][0]['forecasts'][i]['data']['tc_max']
+
+        #ดึงข้อมูล ฝนสะสม
+        rain_data = getdata['WeatherForecasts'][0]['forecasts'][i]['data']['rain']
+
+        data_returns = 'วันที่ {0} \nสภาพอากาศ : {1} \nอุณหภูมิต่ำสุด : {2}  °C\nอุณหภูมิสูงสุด : {3}  °C\nปริมาณฝนสะสม : {4} mm\n=======================\n'.format(day_text, cond_time, tcmin_data, tcmax_data, rain_data)
+        data_return = data_return + data_returns
+
+        i = i + 1
     return data_return
-
-
-def day3(lat,lon):
-    
-
-    #ดึงวันที่ปัจจุบัน
-
-    today = date.today()
-
-    day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
-
-    #วันทีสำหรับใช้ในการส่งหา user
-
-    day_text = today.strftime("%d / %m / %Y") #วันปัจจุบัน
-
-
-    #วันถัดไป
-
-    nextday = date.today() + timedelta(days=1)
-
-    day2_text = nextday.strftime("%d / %m / %Y")
-
-
-    #วันที่3
-
-    nextday = date.today() + timedelta(days=2)
-
-    day3_text = nextday.strftime("%d / %m / %Y")
-
-
-    #ดึงข้อมูลจาก api กรมอุตุนิยมวิทยา
-
-    url = "https://data.tmd.go.th/nwpapi/v1/forecast/location/daily/at"
-
-
-    querystring = {"lat":lat, "lon":lon, "fields":"tc_min,tc_max,rain,cond", "date":day, "hour":"8", "duration":"3"}
-
-
-    headers = {
-
-        'accept': "application/json",
-
-        'authorization': "Bearer " + api_tmd,
-
-    }
-
-
-    response = requests.request("GET", url, headers=headers, params=querystring)
-
-
-    #นำข้อ
-
-    getdata = json.loads(response.text)
-
-
-    ##นำข้อมูลใน array getdata มาใช้##
-
-    #ดึงข้อมูล สภาพอากาศทั่วไป ของวันปัจจุบันและวันถัดไป แล้วแปลงเป็นคำที่เข้าใจโดยใช้ fuction get_cond
-
-    cond_data1 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][0]['data']['cond'])
-
-    cond_data2 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][1]['data']['cond'])
-
-    cond_data3 = get_cond(getdata['WeatherForecasts'][0]['forecasts'][2]['data']['cond'])
-
-
-    #ดึงข้อมูล อุณหภูมิต่ำสุด ของวันปัจจุบันและวันถัดไป หน้วยเป็นองศา
-
-    tcmin_data1 = getdata['WeatherForecasts'][0]['forecasts'][0]['data']['tc_min']
-
-    tcmin_data2 = getdata['WeatherForecasts'][0]['forecasts'][1]['data']['tc_min']
-
-    tcmin_data3 = getdata['WeatherForecasts'][0]['forecasts'][2]['data']['tc_min']
-
-
-    #ดึงข้อมูล อุณหภูมิสูงสุด ของวันปัจจุบันและวันถัดไป หน้วยเป็นองศา
-
-    tcmax_data1 = getdata['WeatherForecasts'][0]['forecasts'][0]['data']['tc_max']
-
-    tcmax_data2 = getdata['WeatherForecasts'][0]['forecasts'][1]['data']['tc_max']
-
-    tcmax_data3 = getdata['WeatherForecasts'][0]['forecasts'][2]['data']['tc_max']
-
-
-    print(response.text)
-
-
-    data_return = 'วันที่ ' + day_text + '\nสภาพอากาศ : ' + cond_data1 + '\nอุณหภูมิต่ำสุด : ' + str(tcmin_data1) + ' °C\nอุณหภูมิสูงสุด : ' + str(tcmax_data1) + ' °C\n======================='+'\nวันที่ ' + day2_text + '\nสภาพอากาศ : ' + cond_data2 + '\nอุณหภูมิต่ำสุด : ' + str(tcmin_data2) + ' °C\nอุณหภูมิสูงสุด : ' + str(tcmax_data2) + ' °C\n======================='+'\nวันที่ ' + day3_text + '\nสภาพอากาศ : ' + cond_data3 + '\nอุณหภูมิต่ำสุด : ' + str(tcmin_data3) + ' °C\nอุณหภูมิสูงสุด : ' + str(tcmax_data3) + ' °C\n======================='
-
-    return data_return
-
 
 def get_cond(cond):
 
@@ -453,6 +486,237 @@ def get_cond(cond):
 
         return 'อากาศร้อนจัด'
 
+@app.route("/")
+def index():
+
+    #ดึงวันที่ปัจจุบัน
+    today = date.today()
+
+    day = str(today.strftime("%Y%m%d")) #วันทีสำหรับใช้ในการดึงข้อมูล
+
+    insight = line_bot_api.get_insight_followers(day)
+    return render_template('index.html', follower=insight.followers)
+
+@app.route("/login")
+def loginform():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    username ='test'
+    password = 'test'
+    user_login = request.form.get('username')
+    pass_login = request.form.get('password')
+    if user_login == username and pass_login == password:
+        session['logged_in'] = True
+        return redirect(url_for('dashboard'))
+    else:
+        return render_template('login.html', alerts=1)
+
+@app.route("/dashboard")
+def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    else:
+        return render_template('dashboard.html')
+
+@app.route('/dashboard', methods=['POST'])
+def dashboard_text():
+    text_broadcast = request.form.get('text_forbroadcast')
+    image_broadcast = request.form.get('image_forbroadcast')
+    if text_broadcast != '':
+        line_bot_api.broadcast(TextSendMessage(text=text_broadcast))
+        return render_template('dashboard.html', alerts=1)
+    else:
+        return render_template('dashboard.html', alerts=2)
+
+@app.route('/hour', methods=['GET'])
+def hour_graphic():
+
+    #get post data
+    lat = str(request.args.get('lat'))
+    lon = str(request.args.get('lon'))
+    hour = int(request.args.get('hours'))
+
+    #ดึงวันที่ปัจจุบัน
+    today = date.today()
+
+    day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
+
+    #ดึงชั่วโมงปัจจุบัน
+    hour_now = datetime.now().astimezone(tz)
+    hournow_text = hour_now.strftime("%H")
+
+    #ดึงข้อมูลจาก api กรมอุตุนิยมวิทยา
+    url = "https://data.tmd.go.th/nwpapi/v1/forecast/location/hourly/at"
+
+    querystring = {"lat":lat, "lon":lon, "fields":"tc,rain,cond,rh", "date":day, "hour":hournow_text, "duration":hour}
+
+    headers = {
+
+        'accept': "application/json",
+
+        'authorization': "Bearer " + api_tmd,
+
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+
+    #นำข้อมูลมาใช้
+    getdata = json.loads(response.text)
+
+    print(response.text)
+
+    i = 0
+    date_list = []
+    get_hour_data = getdata['WeatherForecasts'][0]['forecasts']
+    hourss = int(hour - 1)
+    while i <= hour:
+        #ดึงชั่วโมงถัดไป
+        next_time = datetime.now().astimezone(tz) + timedelta(hours=i)
+        time_text = next_time.strftime("%H:00:00")
+        date_list.append(time_text)
+
+        i = i + 1
+
+    cond_list = []
+    s = 0
+    while s <= hourss:
+        get_text_cond = getdata['WeatherForecasts'][0]['forecasts'][s]['data']['cond']
+        get_text = get_cond(get_text_cond)
+        cond_list.append(get_text)
+        
+        s = s + 1
+    
+    print(cond_list)
+    print(date_list)
+    
+    return render_template('hour.html', data_row=get_hour_data, date=date_list, conds=cond_list, hours=hour)
+
+@app.route('/day', methods=['GET'])
+def day_graphic():
+
+    #get post data
+    lat = str(request.args.get('lat'))
+    lon = str(request.args.get('lon'))
+    days = int(request.args.get('days'))
+
+    #ดึงวันที่ปัจจุบัน
+    today = date.today()
+
+    day = today.strftime("%Y-%m-%d") #วันทีสำหรับใช้ในการดึงข้อมูล
+
+    #ดึงชั่วโมงปัจจุบัน
+    hour_now = datetime.now().astimezone(tz)
+    hournow_text = hour_now.strftime("%H")
+
+    #ดึงข้อมูลจาก api กรมอุตุนิยมวิทยา
+    url = "https://data.tmd.go.th/nwpapi/v1/forecast/location/daily/at"
+
+    querystring = {"lat":lat, "lon":lon, "fields":"tc_min,tc_max,rain,cond,rh", "date":day, "hour":hournow_text, "duration":days}
+
+    headers = {
+
+        'accept': "application/json",
+
+        'authorization': "Bearer " + api_tmd,
+
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+
+
+    #นำข้อมูลมาใช้
+    getdata = json.loads(response.text)
+
+    print(response.text)
+
+    i = 0
+    date_list = []
+    get_day_data = getdata['WeatherForecasts'][0]['forecasts']
+    dayss = int(days - 1)
+    while i <= days:
+        #ดึงชั่วโมงถัดไป
+        next_day = date.today() + timedelta(days=i)
+        day_text = next_day.strftime("%d/%m/%Y")
+        date_list.append(day_text)
+
+        i = i + 1
+
+    cond_list = []
+    s = 0
+    while s <= dayss:
+        get_text_cond = getdata['WeatherForecasts'][0]['forecasts'][s]['data']['cond']
+        get_text = get_cond(get_text_cond)
+        cond_list.append(get_text)
+        
+        s = s + 1
+    
+    print(cond_list)
+    print(date_list)
+    
+    return render_template('day.html', data_row=get_day_data, date=date_list, conds=cond_list, day=days)
+
+@app.route("/webscraping")
+def web_scraping():
+
+    #ดึงวันที่ปัจจุบัน
+    today = date.today()
+    day = str(today.strftime("%Y-%m-%d")) #วันทีสำหรับใช้ในการดึงข้อมูล
+
+    url = "https://www.tmd.go.th/index.php"
+    res = requests.get(url)
+    res.encoding = "utf-8"
+
+    #ทำเว็ป scraping
+    soup = BeautifulSoup(res.text, 'html.parser')
+    courses = soup.find_all(width='130')
+
+    course_list = []
+
+    for course in courses:
+        obj = course.get('src')
+
+        course_list.append(obj)
+
+    image_link1 = str(course_list[1])
+    image_link2 = str(course_list[2])
+
+    link_text1 = image_link1.replace('./', "https://www.tmd.go.th/")
+    link_text2 = image_link2.replace('./', "https://www.tmd.go.th/")
+
+    url1 = slugify(link_text1)
+    url2 = slugify(link_text2)
+
+    link_url1 = url1.replace('https-www-tmd-go-th-programs-uploads-forecast-resized-', "https://www.tmd.go.th/programs/uploads/forecast/")
+    getlink_url1 = link_url1.replace("-dfth1-", "_DFTH1_")
+    change_link1 = getlink_url1.replace("-jpg", ".jpg")
+
+    link_url2 = url2.replace('https-www-tmd-go-th-programs-uploads-forecast-resized-', "https://www.tmd.go.th/programs/uploads/forecast/")
+    getlink_url2 = link_url2.replace("-dfth2-", "_DFTH2_")
+    change_link2 = getlink_url2.replace("-jpg", ".jpg")
+
+    conn = pymysql.connect(host=server_sql, user=username_sql, password=password_sql, database=databasename_sql)
+    cur = conn.cursor()
+
+    sql_check = "SELECT link From news where date=%s "
+    cur.execute(sql_check, (day))
+    result = cur.rowcount
+
+    if result > 1:
+        sql = "UPDATE news SET link=%s where date=%s and type=%s"
+        cur.execute(sql, (change_link1, day, 1))
+        cur.execute(sql, (change_link2, day, 2))
+        conn.commit()
+    else:
+        sql = "INSERT INTO news (link, date, type) VALUES (%s, %s,%s)"
+        cur.execute(sql, (change_link1, day, 1))
+        cur.execute(sql, (change_link2, day, 2))
+        conn.commit()
+    conn.close()
+    return "finish"
 
 if __name__ == "__main__":
+    app.secret_key = os.urandom(12)
     app.run()

@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Line-Bot - Dashboard</title>
+<link href="{{ url_for('static', filename='css/bootstrap-4.4.1.css')}}" rel="stylesheet" type="text/css">
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+function text_alert() {
+  swal("ส่งข้อความระบบสำเร็จ!", "ได้ส่งข้อความหาผู้ใช้งานทุกคนเรียบร้อย", "success");
+}
+
+function image_alert() {
+  swal("ไม่ได้ใส่ข้อความ!", "กรุณาพิมพ์ข้อความลงไปในช่องว่า", "error");
+}
+</script>
+</head>
+
+{% if alerts==1 %}
+<body onload="text_alert()">
+{% elif alerts==2 %}
+<body onload="image_alert()">
+{% else %}
+<body>
+{% endif %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark"> <a class="navbar-brand" href="#">Line-BOT Dashboard</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+	  <div class="navbar-nav">
+      <a class="nav-item nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+    </div>
+  </div>
+</nav>
+<br>
+<h3><center>Broadcast Message</center></h3><br>
+<div class="container-fluid" style="width: 27rem;">
+  <ul id="clothingnav1" class="nav nav-tabs" role="tablist">
+    <li class="nav-item"> <a class="nav-link active" href="#home1" id="hometab1" role="tab" data-toggle="tab" aria-controls="home" aria-expanded="true">ข้อความ</a> </li>
+  </ul>
+  <!-- Content Panel -->
+  <div id="clothingnavcontent1" class="tab-content" style="width: 25rem;">
+    <div role="tabpanel" class="tab-pane fade show active" id="home1" aria-labelledby="hometab1">
+		<br>
+      <form action="{{url_for('dashboard')}}" method="POST"> 
+        <div class="form-group">
+          <label for="text_forbroadcast">ข้อความที่ต้องการประกาศหาผู้ใช้ทุกคน</label>
+          <input type="text" class="form-control" name="text_forbroadcast" id="text_forbroadcast" placeholder="ข้อความ">
+        </div>
+        <button type="submit" class="btn btn-primary">ส่ง</button>
+      </form>
+    </div>
+  </div>
+</div>
+<br>
+<hr>
+<center>
+<p class="mt-5 mb-3 text-muted">Copyright &copy; 2022 &middot; All Rights Reserved &middot; <a href="https://www.facebook.com/krt.korarit/" >Korarit Saengthong</a></p>
+</center>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js')}}"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed --> 
+<script src="{{ url_for('static', filename='js/popper.min.js')}}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap-4.4.1.js')}}"></script>
+</body>
+</html>

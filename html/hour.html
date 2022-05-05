@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hour graphic</title>
+<link href="{{ url_for('static', filename='css/bootstrap-4.4.1.css')}}" rel="stylesheet" type="text/css">
+</head>
+<style>
+	.centered {
+  		position: fixed;
+  		top: 45%;
+  		left: 50%;
+  		transform: translate(-50%, -50%);
+	}
+</style>
+<body>
+<div class="centered">
+<div class="container">
+
+{% for row in data_row|batch(hours) %}
+	<div class="row">
+		{% for column in row %}
+			{% set dates = date[loop.index-1] %}
+			{% set cond = conds[loop.index-1] %}
+			<div class="col-mb-3">
+				<div class="card bg-light mb-3" style="width: 14rem;">
+					<div class="card-header"><center>เวลา {{ dates }}น.</center></div>
+					<div class="card-body">
+						<center>
+						<p class="card-text">สภาพอากาศ : {{ cond }}</p>
+						<hr>
+						<p class="card-text">อุณหภูมิ : {{ column.data.tc }}</p>
+						<hr>
+						<p class="card-text">ฝนสะสม : {{ column.data.rain }}</p>
+						<hr>
+						<p class="card-text">ความชื้น : {{ column.data.rh }} %</p>
+						</center>
+					</div>
+				</div>				  
+			</div>
+		{% endfor %}
+	</div>
+{% endfor%}
+</div>
+<hr>
+<h3><center>ข้อมูลจาก บริการพยากรณ์อากาศจากคอมพิวเตอร์สมรรถนะสูง กรมอุตุนิยมวิทยา</center></h3>
+</div>
+</body>
+</html>

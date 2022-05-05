@@ -1,0 +1,44 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Line-Bot - Login</title>
+
+    <!-- Bootstrap -->
+    <link href="{{ url_for('static', filename='css/bootstrap-4.4.1.css')}}" rel="stylesheet">
+
+    <!-- Css -->
+    <link href="{{ url_for('static', filename='css/signin.css')}}" rel="stylesheet">
+
+    <!-- sweetAlert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        
+    <script>
+      function error_alert() {
+        swal("เข้าสู่ระบบไม่สำเร็จ!", "เข้าสู่ระบบไม่สำเร็จ รหัส หรือ ชื่อผู้ใช้งานไม่ถูกต้อง!", "error");
+      }
+      </script>
+  </head>
+{% if alerts==1 %}
+<body onload="error_alert()">
+{% else %}
+<body>
+{% endif %}
+
+  <form action="{{url_for('login')}}" method="POST" class="form-signin">
+    <h1 class="h3 mb-3 font-weight-normal">Login Dashboard</h1>
+    <label for="username" class="sr-only">User Name</label>
+    <input type="text" name="username" id="username" class="form-control" placeholder="User Name">
+    <label for="password" class="sr-only">Password</label>
+    <input type="password" name="password" id="password" class="form-control" placeholder="Password" >
+    <button class="btn btn-lg btn-primary btn-block" value="Login" type="submit">Sign in</button>
+    <p class="mt-5 mb-3 text-muted">Copyright &copy; 2022 &middot; All Rights Reserved &middot; <a href="https://www.facebook.com/krt.korarit/" >Korarit Saengthong</a></p>
+  </form>
+  <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js')}}"></script>
+
+    <!-- Include all compiled plugins (below), or include individual files as needed --> 
+  <script src="{{ url_for('static', filename='js/popper.min.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap-4.4.1.js')}}"></script>
+</body>
+</html>

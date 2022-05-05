@@ -43,7 +43,7 @@ api key หาได้จาก https://data.tmd.go.th/nwpapi/register เม�
 ## ทดสอบ ระบบได้ที่ Line: รายงานสภาพอากาศ (Test line bot account)
 ID สำหรับแอดไลน์บอท (ID line add friend bot)
 
-> @911xspfk
+> @038asklf
 
 QRCODE ADD ไลน์ (QRCODE line add friend bot)
 
